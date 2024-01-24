@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gray-100 bg-slate-500">
     <header class="bg-blue-500 text-white p-4">
-      <h1 class="text-3xl font-bold w-3/4 mx-auto">Link Shortener</h1>
+      <h1 class="text-3xl font-bold w-3/4 mx-auto">LinkSnip</h1>
     </header>
     <main class="flex-1 p-4 flex flex-col md:flex-row mx-auto w-3/4 bg-slate-100">
       <section class="shorten-section flex-1 md:mr-4 mb-4 md:mb-0">
@@ -13,15 +13,15 @@
         </form>
       </section>
 
-      <aside class="history-sidebar w-full md:w-2/5 p-4 bg-gray-200">
+      <aside class="history-sidebar w-full md:w-2/6 sd:w-full p-4 bg-gray-200 rounded-md md:text-balance">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">Shortened URLs History</h2>
         <ul>
-          <li v-for="(shortLink, index) in shortenedLinks" :key="index" class="mb-2">
-            <div class="flex items-center space-x-2">
-              <a :href="shortLink.shortened" target="_blank" class="text-blue-500 hover:underline">{{ shortLink.shortened }}</a>
+          <li v-for="(shortLink, index) in shortenedLinks" :key="index" class="mb-2 border border-sky-500 p-2 rounded-md">
+            <div class="flex items-center space-x-2 w-ma sd:flex-col flex-row">
+              <a :href="shortLink.shortened" target="_blank" class="text-blue-500 hover:underline p-0">{{ shortLink.shortened }}</a>
               <button @click="copyToClipboard(shortLink.shortened)" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700">Copy</button>
-              <p class="text-gray-600">{{ shortLink.original.substring(0, 35) + '...' }}</p>
             </div>
+            <p class="text-gray-400 mt-2">{{ shortLink.original.substring(0, 35) + '...' }}</p>
           </li>
         </ul>
       </aside>
