@@ -25,9 +25,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import axios from 'axios';
-import { defineComponent } from 'vue';
+import { ref } from 'vue';
 
 interface Data {
   originalLink: string;
@@ -35,57 +35,51 @@ interface Data {
   bitlyAccessToken: string;
 }
 
-export default defineComponent({
-  data(): Data {
-    return {
-      originalLink: '',
-      shortenedLinks: [],
-      bitlyAccessToken: '8c7f4236625160f1963c989d7f7ffdb6f960e5ce',
-    };
-  },
-  methods: {
-    async shortenLink(this: Data): Promise<void> {
-      try {
-        const response = await axios.post(
-          'https://api-ssl.bitly.com/v4/shorten',
-          {
-            long_url: this.originalLink,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${this.bitlyAccessToken}`,
-            },
-          }
-        );
+const data: Data = {
+  originalLink: '',
+  shortenedLinks: [],
+  bitlyAccessToken: '8c7f4236625160f1963c989d7f7ffdb6f960e5ce',
+};
 
-        const shortenedLink = response.data.link;
+const originalLink = ref(data.originalLink);
+const shortenedLinks = ref(data.shortenedLinks);
+const bitlyAccessToken = ref(data.bitlyAccessToken);
 
-        this.shortenedLinks.unshift({
-          original: this.originalLink,
-          shortened: shortenedLink,
-        });
-
-        this.originalLink = '';
-      } catch (error) {
-        if (error instanceof Error) {
-          console.log(error.message);
-        }
+async function shortenLink(): Promise<void> {
+  try {
+    const response = await axios.post(
+      'https://api-ssl.bitly.com/v4/shorten',
+      {
+        long_url: originalLink.value,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${bitlyAccessToken.value}`,
+        },
       }
-    },
-    copyToClipboard(shortenedLink: string): void {
-      const textArea = document.createElement('textarea');
-      textArea.value = shortenedLink;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
+    );
 
-      console.log('Link copied to clipboard');
-    },
-  },
-});
+    const shortenedLink = response.data.link;
+
+    shortenedLinks.value.unshift({
+      original: originalLink.value,
+      shortened: shortenedLink,
+    });
+
+    originalLink.value = '';
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    }
+  }
+}
 </script>
+
+
+
+
+
 
 
 <style></style>
