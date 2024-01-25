@@ -16,12 +16,17 @@
       <aside class="history-sidebar w-full md:w-2/6 sd:w-full p-4 bg-gray-200 rounded-md md:text-balance">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">Shortened URLs History</h2>
         <ul>
-          <li v-for="(shortLink, index) in shortenedLinks" :key="index" class="mb-2 border border-sky-500 p-2 rounded-md">
-            <div class="flex items-center space-x-2 w-ma sd:flex-col flex-row">
-              <a :href="shortLink.shortened" target="_blank" class="text-blue-500 hover:underline p-0">{{ shortLink.shortened }}</a>
-              <button @click="copyToClipboard(shortLink.shortened)" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700">Copy</button>
+          <li v-for="(shortLink, index) in shortenedLinks" :key="index" class="mb-2 border border-sky-500 p-2 rounded-md flex justify-between">
+            <div>
+              <div class="flex items-center space-x-2 w-ma sd:flex-col flex-row">
+                <a :href="shortLink.shortened" target="_blank" class="text-blue-500 hover:underline p-0">{{ shortLink.shortened }}</a>
+                <button @click="copyToClipboard(shortLink.shortened)" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700">Copy</button>
+              </div>
+              <p class="text-gray-400 mt-2">{{ shortLink.original.substring(0, 35) + '...' }}</p>
             </div>
-            <p class="text-gray-400 mt-2">{{ shortLink.original.substring(0, 35) + '...' }}</p>
+            <button @click="removeLink(index)" class="text-red-500 hover:text-red-700 focus:outline-none mr-5">
+              <i class="fas fa-trash-alt text-2xl"></i>
+            </button>
           </li>
         </ul>
       </aside>
@@ -31,11 +36,11 @@
 
 <script setup lang="ts">
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref, onMounted} from 'vue';
 
 interface Data {
   originalLink: string;
-  shortenedLinks: { original: string; shortened: string }[];
+  shortenedLinks: { original: string; shortened: string; title: string }[];
   bitlyAccessToken: string;
 }
 
@@ -48,6 +53,17 @@ const data: Data = {
 const originalLink = ref(data.originalLink);
 const shortenedLinks = ref(data.shortenedLinks);
 const bitlyAccessToken = ref(data.bitlyAccessToken);
+
+function saveToLocalStorage() {
+  localStorage.setItem('shortenedLinks', JSON.stringify(shortenedLinks.value));
+}
+
+onMounted(() => {
+  const storedHistory = localStorage.getItem('shortenedLinks');
+  if (storedHistory) {
+    shortenedLinks.value = JSON.parse(storedHistory);
+  }
+});
 
 async function shortenLink(): Promise<void> {
   try {
@@ -69,9 +85,12 @@ async function shortenLink(): Promise<void> {
     shortenedLinks.value.unshift({
       original: originalLink.value,
       shortened: shortenedLink,
+      title: ''
     });
-
+    
     originalLink.value = '';
+
+    saveToLocalStorage();
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
@@ -87,6 +106,10 @@ function copyToClipboard(link: string): void {
   document.body.removeChild(textArea);
 
   console.log('Link copied to clipboard');
+}
+
+function removeLink(index: number): void {
+  shortenedLinks.value.splice(index, 1);
 }
 </script>
 
