@@ -1,6 +1,6 @@
 # LinkSnip
 
-This template should help get you started developing with Vue 3 in Vite.
+A simple web tool to shorten any url.
 Try it out [here!](https://linksnip-7d59b.web.app/)
 
 ## Project Setup
