@@ -4,6 +4,11 @@
       <h1 class="text-3xl font-bold w-3/4 mx-auto">LinkSnip</h1>
     </header>
     <main class="flex-1 p-4 flex flex-col md:flex-row mx-auto w-3/4 bg-slate-100">
+      <h1>Create acc</h1>
+      <p><input type="text" placeholder="Email" v-model="email"></p>
+      <p><input type="password" placeholder="Password" v-model="password"></p>
+      <p><button @click="register">Submit</button></p>
+      <p><button @click="signInWithGoogle">Sign In with Google</button></p>
       <section class="shorten-section flex-1 md:mr-4 mb-4 md:mb-0">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">Shorten your link!</h2>
         <form
@@ -71,6 +76,32 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+
+const email = ref("");
+const  password = ref("");
+
+const register = () => {
+  createUserWithEmailAndPassword(getAuth(), email.value, password.value)
+  .then((data) => {
+    console.log("successfully registered!");
+    console.log(data);
+  })
+  .catch((error) => {
+    console.log(error.code);
+    alert(error.message);
+  })
+};
+
+const signInWithGoogle = () => {
+  const provider = new GoogleAuthProvider();
+  signInWithPopup(getAuth(), provider)
+  .then((result) => {
+    console.log(result.user);
+  }).catch((error) => {
+    console.log(error);
+  })
+}
 
 interface Data {
   originalLink: string
@@ -147,4 +178,11 @@ function removeLink(index: number): void {
 }
 </script>
 
-<style></style>
+<style>
+input {
+  color: black !important;
+}
+button {
+  color: black;
+}
+</style>
